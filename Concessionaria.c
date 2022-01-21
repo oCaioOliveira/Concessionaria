@@ -1,112 +1,114 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+    /*Struct do proprietario do carro: numCelular é o número de celular do proprietário,
+    identificador é uma chave de identificação para ligar o proprietário aos seus respectivos carros,
+    logo todos os carros pertencentes ao mesmo proprietário terão a mesma chave de identificação*/
+  typedef struct proprietario
+  {
+  char nomeCompleto[70];
+  char cpf[11];
+  char rg[7];
+  char numCelular[13];
+  int identificador;
+  int quantidadeCarros;
+  }Proprietario;
+  
+    /*Struct do carro: identificador é a mesma chave de identificação que o propietário do(s) carro(s) tem.*/
+  typedef struct carro 
+  {
+  char modelo[25];
+  char marca[25];
+  char chassi[17];
+  int identificador;
+  }Carro;
+  
+  /*Cadastro das características do carro de um proprietário.*/
+  void cadastroCarro(int quantidadeCarros, int id, Carro veiculo, FILE *arquivo) {
+      
+    for (int i = 0; i < quantidadeCarros; i ++){
+        printf ("Digite o modelo do carro a ser cadastrado:\n");
+        scanf ("%s", veiculo.modelo);
+        
+        printf ("Digite a marca do carro a ser cadastrada:\n");
+        scanf ("%s", veiculo.marca);
+        
+        printf ("Digite o chassi do carro a ser cadastrado:\n");
+        scanf ("%s", veiculo.chassi);
+        
+        veiculo.identificador = id;
+        
+        fwrite(&veiculo, sizeof(Carro), 1, arquivo);
+    }
+    
+  }
+  
+  /*Cadastro das características de um proprietário de um ou mais carros*/
+  void cadastroProprietario(Proprietario pessoa, Carro veiculo, FILE *arquivo, int id) {
+    printf ("Digite o nome completo da pessoa a ser cadastrada:\n");
+    scanf ("%s", pessoa.nomeCompleto);
+
+    printf ("Digite o CPF da pessoa a ser cadastrada:\n");
+    scanf ("%s", pessoa.cpf);
+
+    printf ("Digite o RG da pessoa a ser cadastrada:\n");
+    scanf ("%s", pessoa.rg);
+
+    printf ("Digite o numero de celular da pessoa a ser cadastrada:\n");
+    scanf ("%s", pessoa.numCelular);
+    
+    pessoa.identificador = id;
+
+    printf ("Digite a quantidade de carros a serem cadastrados no nome de %s:\n", pessoa.nomeCompleto);
+    scanf ("%d", &pessoa.quantidadeCarros);
+    
+    fwrite(&pessoa, sizeof(Proprietario), 1, arquivo);
+    
+    cadastroCarro(pessoa.quantidadeCarros, pessoa.identificador, veiculo, arquivo);
+  }
+
 int main() {
 
-    /*Criacao da variavel que criara um arquivo .txt*/
+    /*Criacao da variavel que criara um dados.bin*/
   FILE *arquivo;
 
-    /*Struct do proprietario do carro*/
-  struct proprietario
-  {
-  char nomeCompleto[100];
-  char cpf[100];
-  char rg[100];
-  char cel[100];
-  int quantidadeCarros;
-  };
+  Proprietario pessoa;
+  Carro veiculo;
 
-    /*Struct do carro*/
-  struct carro {
-  char nome[100];
-  };
-
-  struct proprietario pessoa[20];
-  struct carro veiculo[100];
-
-    /*Cariaveis de auxilio em loops e condicoes*/
-  int nP, nC, p = 0, i = 0, u = 0;
-
-    /*Abre o arquivo .txt para editar ou caso nao exista cria um*/
-  arquivo = fopen("dados.txt", "ab");
+  /*Abre o arquivo .bin para editar ou caso nao exista cria um*/
+  arquivo = fopen("dados.bin", "ab");
 
     /*Condicao para caso o arquivo nao abra*/
   if(arquivo == NULL)
   {
-  printf("Erro na abertura do arquivo!");
-  return 0;
+    printf("Erro na abertura do arquivo!");
+    return 0;
   }
+  
+  /*variavel que significa a opcao no menu apertado pelo usuario*/
+  int opcao;
+  
+  /*Funcionara como um contador para que sempre que um proprietário e seu(s) carro(s) 
+  sejam cadastrado ele somara um e nao se repetira ao longo do programa*/
+  int id = 0;
+  
+    do {
+        printf("Digite a opção desejada:\n");
+        printf("1.Cadastro das características do proprietário e dos seus respectivos carros;\n");
+        printf("2.Sair do programa;\n");
+        
+        scanf("%d", &opcao);
+        
+        if (opcao == 1) {
+            cadastroProprietario(pessoa, veiculo, arquivo, id);
+            id ++;
+        }
+        
+    } while(opcao == 1);
 
-    /*Cadastro de dados*/
-  printf("Digite a quantidade de pessoas a serem cadastradas:\n");
-  scanf ("%d", &nP);
-
-  for (i = 0; i < nP; i ++) {
-    printf ("Digite o nome completo da %d° pessoa a ser cadastrada:\n", i + 1);
-    scanf ("%s", pessoa[i].nomeCompleto);
-    printf ("Digite o CPF da pessoa a ser cadastrada:\n");
-    scanf ("%s", pessoa[i].cpf);
-    printf ("Digite o RG da pessoa a ser cadastrada:\n");
-    scanf ("%s", pessoa[i].rg);
-    printf ("Digite o numero de celular da pessoa a ser cadastrada:\n");
-    scanf ("%s", pessoa[i].cel);
-    printf ("Digite a quantidade de carros a serem cadastrados no nome de %s:\n", pessoa[i].nomeCompleto);
-    scanf ("%d", &pessoa[i].quantidadeCarros);
-
-    for (u = 0; u < pessoa[i].quantidadeCarros; u ++) {
-      printf ("Digite o nome do %d° carro do/a %s a ser cadastrada:\n", u + 1, pessoa[i].nomeCompleto);
-      scanf ("%s", veiculo[p].nome);
-      p ++;
-    }
-  }
-
-  p = 0;
-  i = 0;
-  u = 0;
-
-    /*Printa os dados criados anteriormente na tela e os adiciona ao arquivo .txt*/
-  for (i = 0; i < nP; i ++) {
-    printf ("Nome completo:\t%s\n", pessoa[i].nomeCompleto);
-    fprintf(arquivo, "%s", "Nome Completo: ");
-    fwrite(pessoa[i].nomeCompleto, sizeof (char), 100, arquivo);
-    fprintf(arquivo, "%s", "\n");
-
-    printf ("CPF:\t%s\n", pessoa[i].cpf);
-    fprintf(arquivo, "%s", "CPF: ");
-    fwrite(pessoa[i].cpf, sizeof (char), 100, arquivo);
-    fprintf(arquivo, "%s", "\n");
-
-    printf ("RG:\t%s\n", pessoa[i].rg);
-    fprintf(arquivo, "%s", "RG: ");
-    fwrite(pessoa[i].rg, sizeof (char), 100, arquivo);
-    fprintf(arquivo, "%s", "\n");
-
-    printf ("Numero de celular:\t%s\n", pessoa[i].cel);
-    fprintf(arquivo, "%s", "Numero de Celular: ");
-    fwrite(pessoa[i].cel, sizeof (char), 100, arquivo);
-    fprintf(arquivo, "%s", "\n");
-
-    printf ("Quantidade de carros:\t%d\n", pessoa[i].quantidadeCarros);
-    fprintf(arquivo, "%s", "Quantidade de carros: ");
-    fprintf(arquivo, "%d", pessoa[i].quantidadeCarros);
-    fprintf(arquivo, "%s", "\n");
-
-    printf ("Carro(s):");
-
-    for (u = 0; u < pessoa[i].quantidadeCarros; u ++){
-      fprintf(arquivo, "%s", "Carro: ");
-      printf ("\t%s", veiculo[p].nome);
-      fwrite(veiculo[p].nome, sizeof (char), 100, arquivo);
-      fprintf(arquivo, "%s", "\n");
-      p ++;
-    }
-    printf ("\n");
-    fprintf(arquivo, "%s", "\n");
-    printf("------------------------------\n");
-  }
-
-    /*Fecha o arquivo .txt*/
-  fclose(arquivo);
+    /*Fecha o arquivo dados.bin*/
+    fclose(arquivo);
 
   return 0;
+
 }
